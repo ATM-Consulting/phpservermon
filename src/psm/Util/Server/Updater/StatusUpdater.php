@@ -83,7 +83,7 @@ class StatusUpdater {
 			'server_id' => $server_id,
 		), array(
 			'server_id', 'ip', 'port', 'label', 'type', 'pattern', 'status', 'active', 'warning_threshold',
-			'warning_threshold_counter', 'timeout', 'website_username', 'website_password'
+			'warning_threshold_counter', 'timeout', 'website_username', 'website_password' , 'save_feedback'
 		));
 		if(empty($this->server)) {
 			return false;
@@ -117,6 +117,7 @@ class StatusUpdater {
 			$save['status'] = 'on';
 			$save['last_online'] = date('Y-m-d H:i:s');
 			$save['warning_threshold_counter'] = 0;
+			$save['feedback'] = $this->server['feedback'];
 		} else {
 			// server is offline, increase the error counter
 			$save['warning_threshold_counter'] = $this->server['warning_threshold_counter'] + 1;
@@ -208,17 +209,18 @@ class StatusUpdater {
 	 */
 	protected function updateWebsite($max_runs, $run = 1) {
 		$starttime = microtime(true);
-
+		
 		// We're only interested in the header, because that should tell us plenty!
 		// unless we have a pattern to search for!
-		$curl_result = psm_curl_get(
+		list($curl_result, $curl_info) = psm_curl_get(
 			$this->server['ip'],
 			true,
-			($this->server['pattern'] == '' ? false : true),
+			(!empty($this->server['pattern']) || $this->server['save_feedback'] ? true : false),
 			$this->server['timeout'],
 			true,
 			$this->server['website_username'],
-			psm_password_decrypt($this->server['server_id'] . psm_get_conf('password_encrypt_key'), $this->server['website_password'])
+			psm_password_decrypt($this->server['server_id'] . psm_get_conf('password_encrypt_key'), $this->server['website_password']),
+			true
 		);
 
 		$this->rtime = (microtime(true) - $starttime);
@@ -253,6 +255,10 @@ class StatusUpdater {
 						$this->error = 'TEXT ERROR : Pattern not found.';
 						$result = false;
 					}
+				}
+				
+				if ($this->server['save_feedback']) {
+					$this->server['feedback'] = ($curl_info['header_size'] > 0) ? substr($curl_result, $curl_info['header_size']) : $curl_result;
 				}
 			}
 		}

@@ -315,7 +315,7 @@ function psm_parse_msg($status, $type, $vars) {
  * @param string|bool $website_password Password website
  * @return string cURL result
  */
-function psm_curl_get($href, $header = false, $body = true, $timeout = null, $add_agent = true, $website_username = false, $website_password = false) {
+function psm_curl_get($href, $header = false, $body = true, $timeout = null, $add_agent = true, $website_username = false, $website_password = false, $get_curl_info = false) {
 	$timeout = $timeout == null ? PSM_CURL_TIMEOUT : intval($timeout);
 
 	$ch = curl_init();
@@ -350,9 +350,17 @@ function psm_curl_get($href, $header = false, $body = true, $timeout = null, $ad
 	}
 
 	$result = curl_exec($ch);
-	curl_close($ch);
+	
+	if ($get_curl_info) {
+		$info = curl_getinfo($ch);
+		curl_close($ch);
 
-	return $result;
+		return array($result, $info);
+	} else {
+		curl_close($ch);
+
+		return $result;
+	}
 }
 
 /**

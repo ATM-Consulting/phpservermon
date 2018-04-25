@@ -238,6 +238,8 @@ class Installer {
                           `timeout` smallint(1) unsigned NULL DEFAULT NULL,
                           `website_username` varchar(255) DEFAULT NULL,
 						  `website_password` varchar(255) DEFAULT NULL,
+						  `save_feedback` tinyint(1) DEFAULT NULL,
+						  `feedback` longtext,
 						  PRIMARY KEY  (`server_id`)
 						) ENGINE=MyISAM  DEFAULT CHARSET=utf8;",
 			PSM_DB_PREFIX . 'servers_uptime' => "CREATE TABLE IF NOT EXISTS `" . PSM_DB_PREFIX . "servers_uptime` (
@@ -451,6 +453,8 @@ class Installer {
 					('proxy_url', ''),
 					('proxy_user', ''),
 					('proxy_password', '');";
+		$queries[] = "ALTER TABLE `" . PSM_DB_PREFIX . "servers` ADD `save_feedback` tinyint(1) DEFAULT NULL;";
+		$queries[] = "ALTER TABLE `" . PSM_DB_PREFIX . "servers` ADD `feedback` longtext;";
 
 		$this->execSQL($queries);
 

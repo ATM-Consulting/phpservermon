@@ -66,6 +66,12 @@
 			</div>
 		</div>
 		<div class="control-group">
+			<label class="control-label" for="save_feedback">{{ label_save_feedback }}</label>
+			<div class="controls">
+				<input class="input-mini" type="checkbox" id="save_feedback" name="save_feedback" value="1" {{ (edit_value_save_feedback) ? 'checked' : '' }} data-toggle="tooltip" />
+			</div>
+		</div>
+		<div class="control-group">
 			<label class="control-label" for="warning_threshold">{{ label_warning_threshold }}</label>
 			<div class="controls">
 				<input class="input-mini" type="text" id="warning_threshold" name="warning_threshold" value="{{ edit_value_warning_threshold }}" maxlength="5" data-toggle="tooltip" title="{{ label_warning_threshold_description }}" />
